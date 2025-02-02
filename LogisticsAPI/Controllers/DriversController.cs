@@ -5,6 +5,7 @@ using Microsoft.Data.Sqlite;
 
 namespace LogisticsAPI.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/driver")]
 public class DriversController : ControllerBase

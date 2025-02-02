@@ -9,16 +9,25 @@ using Microsoft.Data.Sqlite;
 
 namespace LogisticsAPI.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/dispatcher")]
 public class DispatcherController : ControllerBase
 {
     private readonly DatabaseConnection _databaseConnection = new();
 
+    
+    private bool UserCanEditDispatchers()
+    {
+        return User.HasClaim(c => c is { Type: "CanEditDispatchers", Value: "True" });
+    }
+    
     [HttpGet]
     public IActionResult GetDispatchers()
     {
-
+        if (!UserCanEditDispatchers())
+            return Forbid();
+        
         using var connection = _databaseConnection.GetConnection();
         connection.Open();
 
@@ -41,7 +50,9 @@ public class DispatcherController : ControllerBase
     [HttpGet("{username}")]
     public IActionResult GetDispatcher(string username)
     {
-
+        if (!UserCanEditDispatchers())
+            return Forbid();
+        
         using var connection = _databaseConnection.GetConnection();
         connection.Open();
 
@@ -69,6 +80,9 @@ public class DispatcherController : ControllerBase
     public IActionResult CreateDispatcher(string username, [FromBody] DispatcherData dispatcher)
     {
 
+        if (!UserCanEditDispatchers())
+            return Forbid();
+        
         using var connection = _databaseConnection.GetConnection();
         connection.Open();
 
@@ -101,6 +115,9 @@ public class DispatcherController : ControllerBase
     [HttpPatch("{username}")]
     public IActionResult UpdateDispatcher(string username, [FromBody] DispatcherData dispatcher)
     {
+        if (!UserCanEditDispatchers())
+            return Forbid();
+        
         using var connection = _databaseConnection.GetConnection();
         connection.Open();
 
@@ -145,6 +162,9 @@ public class DispatcherController : ControllerBase
     public IActionResult DeleteDispatcher(string username)
     {
 
+        if (!UserCanEditDispatchers())
+            return Forbid();
+        
         using var connection = _databaseConnection.GetConnection();
         connection.Open();
 
